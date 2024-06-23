@@ -1,85 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Container, ThemeProvider, createTheme } from '@mui/material';
-import Header from './Header';
-import CategoryList from './CategoryList';
-import SeoEditor from './SeoEditor';
+const backendUrl = "https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com";
 
-const backendUrl = "https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/";
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
-
-const App = () => {
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [seoData, setSeoData] = useState({ description: '', meta_description: '' });
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+async function fetchCategories() {
     try {
-      const response = await axios.get('http://localhost:8000/api/categories');
-      setCategories(response.data);
+        const response = await fetch(`${backendUrl}/api/categories`);
+        const data = await response.json();
+        if (response.ok) {
+            // Handle the data
+        } else {
+            console.error("Error fetching categories:", data.error);
+        }
     } catch (error) {
-      console.error("Wystąpił błąd podczas pobierania kategorii!", error);
+        console.error("Error fetching categories:", error);
     }
-  };
+}
 
-  const generateSeo = async (category) => {
+async function generateSEO(categoryName) {
     try {
-      const response = await axios.post('http://localhost:8000/api/generate_seo', category);
-      setSeoData(response.data);
-      setSelectedCategory(category);
+        const response = await fetch(`${backendUrl}/api/generate_seo`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: categoryName }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            // Handle the data
+        } else {
+            console.error("Error generating SEO:", data.error);
+        }
     } catch (error) {
-      console.error("Wystąpił błąd podczas generowania danych SEO!", error);
+        console.error("Error generating SEO:", error);
     }
-  };
-
-  const saveSeoData = async () => {
-    try {
-      await axios.put(`http://localhost:8000/api/categories/${selectedCategory.id}`, seoData);
-      fetchCategories();
-      setSelectedCategory(null);
-      setSeoData({ description: '', meta_description: '' });
-    } catch (error) {
-      console.error("Wystąpił błąd podczas zapisywania danych SEO!", error);
-    }
-  };
-
-  const handleCancel = () => {
-    setSelectedCategory(null);
-    setSeoData({ description: '', meta_description: '' });
-  };
-
-  return (
-    <ThemeProvider theme={theme}>
-      <Header />
-      <Container>
-        {!selectedCategory ? (
-          <CategoryList categories={categories} onSelect={generateSeo} />
-        ) : (
-          <SeoEditor
-            category={selectedCategory}
-            seoData={seoData}
-            onGenerate={generateSeo}
-            onSave={saveSeoData}
-            onCancel={handleCancel}
-            onChange={setSeoData}
-          />
-        )}
-      </Container>
-    </ThemeProvider>
-  );
-};
-
-export default App;
+}
