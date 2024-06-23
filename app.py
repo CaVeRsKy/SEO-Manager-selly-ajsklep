@@ -10,6 +10,17 @@ SELY_CLIENT_ID = os.environ.get('SELY_CLIENT_ID')
 SELY_CLIENT_SECRET = os.environ.get('SELY_CLIENT_SECRET')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
+@app.route('/api/env', methods=['GET'])
+def get_env():
+    return jsonify({
+        'SELY_CLIENT_ID': SELY_CLIENT_ID,
+        'SELY_CLIENT_SECRET': SELY_CLIENT_SECRET,
+        'OPENAI_API_KEY': OPENAI_API_KEY
+    })
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    
 def get_selly_access_token():
     url = 'https://ajsklep.pl/api/v1/auth/login'
     headers = {
@@ -21,8 +32,6 @@ def get_selly_access_token():
         'scope': 'READWRITE'
     }
     response = requests.post(url, json=data, headers=headers)
-    if response.status_code == 405:
-        return {'error': 'Method Not Allowed'}, 405
     response.raise_for_status()
     return response.json()['access_token']
 
@@ -30,8 +39,6 @@ def get_selly_access_token():
 def get_categories():
     try:
         access_token = get_selly_access_token()
-        if 'error' in access_token:
-            return jsonify(access_token), 405
         url = 'https://ajsklep.pl/api/v1/categories'
         headers = {
             'Authorization': f'Bearer {access_token}'
@@ -61,8 +68,6 @@ def generate_description():
             'max_tokens': 150,
         }
     )
-    if response.status_code == 400:
-        return jsonify({'error': 'Bad Request to OpenAI'}), 400
     response.raise_for_status()
     generated_text = response.json()['choices'][0]['text']
     return jsonify({'description': generated_text.strip()})
