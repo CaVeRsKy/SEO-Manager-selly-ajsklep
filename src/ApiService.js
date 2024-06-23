@@ -12,9 +12,9 @@ export const getCategories = async () => {
     }
 };
 
-export const generateDescription = async (categoryId) => {
+export const generateDescription = async (categoryName) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/api/generate-description`, { categoryId });
+        const response = await axios.post(`${API_BASE_URL}/api/generate-description`, { category_name: categoryName });
         return response.data;
     } catch (error) {
         console.error('Error generating description:', error);
