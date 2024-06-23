@@ -1,94 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
+const form = document.getElementById('seo-form');
 
-const backendUrl = "https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com";
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => data[key] = value);
 
-const CategoryList = () => {
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [seoPreview, setSeoPreview] = useState("");
-
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch(`${backendUrl}/api/categories`);
-            const data = await response.json();
-            if (response.ok) {
-                setCategories(data);
-            } else {
-                console.error("Error fetching categories:", data.error);
+    try {
+        const response = await fetch('https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/category', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        } finally {
-            setLoading(false);
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-    };
 
-    const generateSEO = async (categoryName) => {
-        try {
-            const response = await fetch(`${backendUrl}/api/generate_seo`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name: categoryName }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setSeoPreview(data.seo_description);
-            } else {
-                console.error("Error generating SEO:", data.error);
-            }
-        } catch (error) {
-            console.error("Error generating SEO:", error);
-        }
-    };
-
-    const handleCategoryClick = (category) => {
-        setSelectedCategory(category);
-        generateSEO(category.name);
-    };
-
-    const renderCategories = (categories) => {
-        return (
-            <List>
-                {categories.map((category) => (
-                    <div key={category.id}>
-                        <ListItem button onClick={() => handleCategoryClick(category)}>
-                            <ListItemText primary={category.name} />
-                        </ListItem>
-                        {category.subcategories && renderCategories(category.subcategories)}
-                    </div>
-                ))}
-            </List>
-        );
-    };
-
-    return (
-        <Container>
-            <Typography variant="h4" gutterBottom>
-                Lista kategorii
-            </Typography>
-            {loading ? (
-                <CircularProgress />
-            ) : (
-                renderCategories(categories)
-            )}
-            {selectedCategory && (
-                <div>
-                    <Typography variant="h5" gutterBottom>
-                        Podgląd SEO dla: {selectedCategory.name}
-                    </Typography>
-                    <Typography variant="body1">{seoPreview}</Typography>
-                </div>
-            )}
-        </Container>
-    );
-};
-
-export default CategoryList;
+        const result = await response.json();
+        console.log(result);
+        // Here you can update the DOM or perform any actions with the received data
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+    }
+});

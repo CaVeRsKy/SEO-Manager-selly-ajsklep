@@ -1,27 +1,42 @@
-from flask import Flask, request, jsonify
+import os
+import requests
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
+# Pobieranie danych uwierzytelniających z zmiennych środowiskowych
+CLIENT_ID = os.getenv('SELLY_CLIENT_ID')
+CLIENT_SECRET = os.getenv('SELLY_CLIENT_SECRET')
+
+def get_access_token():
+    url = "https://ajsklep.pl/api/v2/auth/login"
+    payload = {
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "scope": "READWRITE"
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    response_data = response.json()
+    return response_data['access_token']
+
 @app.route('/')
-def index():
-    return "Hello, world!"
+def home():
+    return "Hello, this is the Selly API integration!"
 
-@app.route('/api/categories', methods=['GET'])
-def get_categories():
-    categories = [
-        {"id": 1, "name": "Category 1", "subcategories": []},
-        {"id": 2, "name": "Category 2", "subcategories": []}
-    ]
-    return jsonify(categories)
-
-@app.route('/api/generate_seo', methods=['POST'])
-def generate_seo():
-    data = request.json
-    category_name = data.get('name')
-    seo_description = f"SEO description for {category_name}"
-    return jsonify({"seo_description": seo_description})
+@app.route('/api/category')
+def get_category():
+    access_token = get_access_token()
+    url = "https://ajsklep.pl/api/v2/category"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    response = requests.get(url, headers=headers)
+    return jsonify(response.json())
 
 if __name__ == '__main__':
     app.run(debug=True)
