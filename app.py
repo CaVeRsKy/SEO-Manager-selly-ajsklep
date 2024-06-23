@@ -26,14 +26,17 @@ def get_selly_access_token():
 
 @app.route('/api/categories', methods=['GET'])
 def get_categories():
-    access_token = get_selly_access_token()
-    url = 'https://ajsklep.pl/api/v1/categories'
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return jsonify(response.json())
+    try:
+        access_token = get_selly_access_token()
+        url = 'https://ajsklep.pl/api/v1/categories'
+        headers = {
+            'Authorization': f'Bearer {access_token}'
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)}), 401
 
 @app.route('/api/generate-description', methods=['POST'])
 def generate_description():
