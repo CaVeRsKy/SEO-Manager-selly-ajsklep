@@ -2,6 +2,10 @@ from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import openai
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Ładuje wartości z pliku .env
 
 app = Flask(__name__)
 
@@ -9,10 +13,10 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Konfiguracja kluczy API
-openai.api_key = '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'
+openai.api_key = os.getenv('OPENAI_API_KEY')
 selly_api_base = 'https://ajsklep.pl/api'
-selly_client_id = 'aplikacjadoseo-152450a3faeb540'
-selly_client_secret = 'aplikacjadoseo-02a927eb72cd4b61a708fc31d4b07f4a4361a57e'
+selly_client_id = os.getenv('SELLY_CLIENT_ID')
+selly_client_secret = os.getenv('SELLY_CLIENT_SECRET')
 
 # Funkcja do uzyskiwania tokenu dostępu
 def get_access_token():
@@ -49,7 +53,7 @@ def find_categories_without_descriptions(categories):
     for category in categories:
         if not category.get('description'):
             categories_without_descriptions.append(category)
-        if 'subcategories' in category:
+        if 'subcategories' in category and category['subcategories']:
             categories_without_descriptions.extend(find_categories_without_descriptions(category['subcategories']))
     return categories_without_descriptions
 
@@ -61,8 +65,8 @@ def get_categories():
         headers = {'Authorization': f'Bearer {access_token}'}
         response = requests.get(f'{selly_api_base}/categories', headers=headers)
         categories = response.json()['data']
-        all_categories = find_categories_without_descriptions(categories)
-        resp = make_response(jsonify(all_categories))
+        filtered_categories = find_categories_without_descriptions(categories)
+        resp = make_response(jsonify(filtered_categories))
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
         resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
