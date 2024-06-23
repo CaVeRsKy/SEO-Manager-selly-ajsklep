@@ -5,6 +5,7 @@ import Header from './Header';
 import CategoryList from './CategoryList';
 import SeoEditor from './SeoEditor';
 
+const backendUrl = "https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/";
 const theme = createTheme({
   palette: {
     primary: {
