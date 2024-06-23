@@ -21,6 +21,10 @@ def get_selly_access_token():
         'scope': 'READWRITE'
     }
     response = requests.post(url, json=data, headers=headers)
+    print(f"Response status code: {response.status_code}")
+    print(f"Response content: {response.content.decode()}")
+    if response.status_code == 405:
+        return {'error': 'Method Not Allowed'}, 405
     response.raise_for_status()
     return response.json()['access_token']
 
@@ -28,6 +32,8 @@ def get_selly_access_token():
 def get_categories():
     try:
         access_token = get_selly_access_token()
+        if 'error' in access_token:
+            return jsonify(access_token), 405
         url = 'https://ajsklep.pl/api/v1/categories'
         headers = {
             'Authorization': f'Bearer {access_token}'
@@ -55,9 +61,6 @@ def generate_description():
         json={
             'prompt': prompt,
             'max_tokens': 150,
-            'n': 1,
-            'stop': None,
-            'temperature': 1.0
         }
     )
     if response.status_code == 400:
@@ -65,14 +68,6 @@ def generate_description():
     response.raise_for_status()
     generated_text = response.json()['choices'][0]['text']
     return jsonify({'description': generated_text.strip()})
-
-@app.route('/api/env', methods=['GET'])
-def get_env():
-    return jsonify({
-        'SELY_CLIENT_ID': SELY_CLIENT_ID,
-        'SELY_CLIENT_SECRET': SELY_CLIENT_SECRET,
-        'OPENAI_API_KEY': OPENAI_API_KEY
-    })
 
 if __name__ == '__main__':
     app.run(debug=True)
