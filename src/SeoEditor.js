@@ -6,7 +6,7 @@ const SeoEditor = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch('https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/category');
+                const response = await fetch('https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/categories');
                 const data = await response.json();
                 setCategories(data.categories);
             } catch (error) {

@@ -28,8 +28,8 @@ def get_access_token():
 def home():
     return "Hello, this is the Selly API integration!"
 
-@app.route('/api/category')
-def get_category():
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
     access_token = get_access_token()
     url = "https://ajsklep.pl/api/v2/category"
     headers = {
