@@ -1,0 +1,23 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.container {
+  padding: 20px;
+}
+
+.category-list {
+  margin-top: 20px;
+}
+
+.seo-editor {
+  margin-top: 20px;
+  padding: 20px;
+}
