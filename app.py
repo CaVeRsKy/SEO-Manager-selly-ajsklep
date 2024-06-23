@@ -11,7 +11,7 @@ SELY_CLIENT_SECRET = os.environ.get('SELY_CLIENT_SECRET')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 def get_selly_access_token():
-    url = 'https://api.selly.pl/auth/login'
+    url = 'https://ajsklep.pl/api/auth/access_token'
     headers = {
         'Content-Type': 'application/json',
     }
@@ -30,7 +30,7 @@ def get_selly_access_token():
 def get_categories():
     try:
         access_token = get_selly_access_token()
-        url = 'https://api.selly.pl/categories'
+        url = 'https://ajsklep.pl/api/categories'
         headers = {
             'Authorization': f'Bearer {access_token}'
         }
