@@ -45,29 +45,38 @@ def get_categories():
         access_token = get_selly_access_token()
         if access_token is None:
             return jsonify({'error': 'Failed to retrieve access token'}), 401
+        url = 'https://ajsklep.pl/api/categories'
+        headers = {
+            'Authorization': f'Bearer {access_token}'
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
 
-        all_categories = []
-        page = 1
-        while True:
-            url = f'https://ajsklep.pl/api/categories?page={page}'
-            headers = {
-                'Authorization': f'Bearer {access_token}'
-            }
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            data = response.json()
-            categories_data = data['data']
-            all_categories.extend(categories_data)
+        categories_data = response.json().get('data')
+        if not categories_data:
+            return jsonify({'error': 'No categories data found'}), 404
 
-            # Check if there are more pages
-            if page >= data['__metadata']['page_count']:
-                break
-            page += 1
+        def parse_categories(categories):
+            parsed_categories = []
+            for category in categories:
+                parsed_categories.append({
+                    'id': category.get('id'),
+                    'name': category.get('name'),
+                    'subcategories': parse_categories(category.get('subcategories', []))
+                })
+            return parsed_categories
 
-        return jsonify(all_categories)
+        parsed_categories = parse_categories(categories_data)
+        return jsonify({'categories': parsed_categories})
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
-        return jsonify({'error': str(e)}), 401
+        return jsonify({'error': 'Error fetching categories', 'message': str(e)}), 500
+    except ValueError as ve:
+        app.logger.error(f"Value error: {str(ve)}")
+        return jsonify({'error': str(ve)}), 400
+    except KeyError as ke:
+        app.logger.error(f"Key error: {str(ke)}")
+        return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
 
 @app.route('/api/generate-description', methods=['POST'])
 def generate_description():

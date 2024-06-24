@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './SeoEditor.css'
+
 
 const SeoEditor = () => {
     const [categories, setCategories] = useState([]);
