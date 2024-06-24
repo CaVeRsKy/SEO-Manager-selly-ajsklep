@@ -10,6 +10,11 @@ SELY_CLIENT_ID = os.environ.get('SELY_CLIENT_ID')
 SELY_CLIENT_SECRET = os.environ.get('SELY_CLIENT_SECRET')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
+@app.route('/', methods=['GET'])
+def home():
+    return "Welcome to the SEO Selly API!", 200
+
+
 def get_selly_access_token():
     url = 'https://ajsklep.pl/api/auth/access_token'
     headers = {
