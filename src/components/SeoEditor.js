@@ -14,7 +14,7 @@ const SeoEditor = () => {
                     console.error('Unauthorized access - check your API credentials');
                 } else {
                     const data = await response.json();
-                    setCategories(data.categories);
+                    setCategories(data.categories || []); // <-- Zapewniamy, że categories nie jest undefined
                 }
             } catch (error) {
                 console.error('Error fetching categories:', error);
