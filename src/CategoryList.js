@@ -18,7 +18,6 @@ const CategoryList = () => {
             const response = await fetch(`${backendUrl}/api/categories`);
             const data = await response.json();
             if (response.ok) {
-                // Log the received categories
                 console.log(data);
                 setCategories(data);
             } else {
@@ -33,12 +32,12 @@ const CategoryList = () => {
 
     const generateSEO = async (categoryName) => {
         try {
-            const response = await fetch(`${backendUrl}/api/generate_seo`, {
+            const response = await fetch(`${backendUrl}/api/generate-description`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name: categoryName }),
+                body: JSON.stringify({ category_name: categoryName }),
             });
             const data = await response.json();
             if (response.ok) {
