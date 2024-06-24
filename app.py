@@ -60,6 +60,8 @@ def generate_description():
                 'max_tokens': 150,
             }
         )
+        if response.status_code == 400:
+            return jsonify({'error': 'Bad Request to OpenAI'}), 400
         response.raise_for_status()
         generated_text = response.json()['choices'][0]['text']
         return jsonify({'description': generated_text.strip()})
@@ -69,6 +71,14 @@ def generate_description():
     except Exception as e:
         app.logger.error(f"Unexpected error: {str(e)}")
         return jsonify({'error': 'Internal Server Error'}), 500
+
+@app.route('/api/env', methods=['GET'])
+def get_env():
+    return jsonify({
+        'SELY_CLIENT_ID': SELY_CLIENT_ID,
+        'SELY_CLIENT_SECRET': SELY_CLIENT_SECRET,
+        'OPENAI_API_KEY': OPENAI_API_KEY
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
