@@ -14,10 +14,11 @@ const SeoEditor = () => {
                     console.error('Unauthorized access - check your API credentials');
                 } else {
                     const data = await response.json();
-                    if (data && data.categories) {
-                        setCategories(data.categories);
+                    console.log('API response:', data);  // Log the response data for debugging
+                    if (data && Array.isArray(data)) {
+                        setCategories(data);
                     } else {
-                        console.error('Invalid data format received from API');
+                        console.error('Invalid data format received from API', data);
                     }
                 }
             } catch (error) {
@@ -47,7 +48,7 @@ const SeoEditor = () => {
             if (data && data.description) {
                 setGeneratedDescription(data.description);
             } else {
-                console.error('Invalid data format received from API');
+                console.error('Invalid data format received from API', data);
             }
         } catch (error) {
             console.error('Error generating description:', error);
