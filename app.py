@@ -39,7 +39,6 @@ def get_selly_access_token():
         raise ValueError("Failed to retrieve access token from Selly API")
     return access_token
 
-
 @app.route('/api/categories', methods=['GET'])
 def get_categories():
     try:
@@ -52,11 +51,12 @@ def get_categories():
         }
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        
+
+        # Sprawdzenie, czy dane są w odpowiednim formacie
         categories_data = response.json().get('data')
         if not categories_data:
             return jsonify({'error': 'No categories data found'}), 404
-        
+
         def parse_categories(categories):
             parsed_categories = []
             for category in categories:
@@ -66,12 +66,12 @@ def get_categories():
                     'subcategories': parse_categories(category.get('subcategories', []))
                 })
             return parsed_categories
-        
+
         parsed_categories = parse_categories(categories_data)
         return jsonify({'categories': parsed_categories})
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
-        return jsonify({'error': str(e)}), 401
+        return jsonify({'error': 'Error fetching categories', 'message': str(e)}), 500
 
 @app.route('/api/generate-description', methods=['POST'])
 def generate_description():
@@ -100,7 +100,7 @@ def generate_description():
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error generating description: {str(e)}")
-        return jsonify({'error': str(e)}), 401
+        return jsonify({'error': 'Error generating description', 'message': str(e)}), 500
     except ValueError as ve:
         app.logger.error(f"Value error: {str(ve)}")
         return jsonify({'error': str(ve)}), 400
