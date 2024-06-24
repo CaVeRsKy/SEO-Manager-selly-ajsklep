@@ -1,27 +1,50 @@
-h2 {
-    color: #282c34;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  li {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #61dafb;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #21a1f1;
-  }
-  
+.seo-editor {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+.categories, .editor, .preview {
+  margin-bottom: 20px;
+}
+
+.categories ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.categories li {
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.categories li.selected {
+  background-color: #d0d0f0;
+  font-weight: bold;
+}
+
+.editor button {
+  margin-right: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.editor button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.preview p {
+  white-space: pre-wrap;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
