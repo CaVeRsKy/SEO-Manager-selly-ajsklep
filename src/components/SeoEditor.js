@@ -14,7 +14,11 @@ const SeoEditor = () => {
                     console.error('Unauthorized access - check your API credentials');
                 } else {
                     const data = await response.json();
-                    setCategories(data.categories || []); // <-- Zapewniamy, że categories nie jest undefined
+                    if (data && data.categories) {
+                        setCategories(data.categories);
+                    } else {
+                        console.error('Invalid data format received from API');
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -25,6 +29,11 @@ const SeoEditor = () => {
     }, []);
 
     const generateDescription = async () => {
+        if (!selectedCategory) {
+            console.error('No category selected');
+            return;
+        }
+
         try {
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/generate-description`, {
                 method: 'POST',
@@ -35,7 +44,11 @@ const SeoEditor = () => {
             });
 
             const data = await response.json();
-            setGeneratedDescription(data.description);
+            if (data && data.description) {
+                setGeneratedDescription(data.description);
+            } else {
+                console.error('Invalid data format received from API');
+            }
         } catch (error) {
             console.error('Error generating description:', error);
         }
@@ -47,11 +60,11 @@ const SeoEditor = () => {
             <div>
                 <select onChange={(e) => setSelectedCategory(categories.find(cat => cat.id === e.target.value))}>
                     <option value="">Select a category</option>
-                    {categories.map((category) => (
+                    {categories.length > 0 ? categories.map((category) => (
                         <option key={category.id} value={category.id}>
                             {category.name}
                         </option>
-                    ))}
+                    )) : <option>Loading categories...</option>}
                 </select>
             </div>
             {selectedCategory && (
