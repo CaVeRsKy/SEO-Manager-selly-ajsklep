@@ -16,10 +16,9 @@ def get_selly_access_token():
         'Content-Type': 'application/json',
     }
     data = {
-        'grant_type': 'client_credentials',
-        'scope': 'READWRITE',
         'client_id': SELY_CLIENT_ID,
-        'client_secret': SELY_CLIENT_SECRET
+        'client_secret': SELY_CLIENT_SECRET,
+        'scope': 'READWRITE'
     }
     response = requests.post(url, json=data, headers=headers)
     response.raise_for_status()
@@ -37,7 +36,7 @@ def get_categories():
         response.raise_for_status()
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error getting categories: {str(e)}")
+        app.logger.error(f"Error fetching categories: {str(e)}")
         return jsonify({'error': str(e)}), 401
 
 @app.route('/api/generate-description', methods=['POST'])
@@ -50,35 +49,23 @@ def generate_description():
 
         prompt = f"Generate a product description for the category: {category_name}"
         response = requests.post(
-            'https://api.openai.com/v1/engines/gpt-4/completions',
+            'https://api.openai.com/v1/chat/completions',
             headers={
                 'Authorization': f'Bearer {OPENAI_API_KEY}',
                 'Content-Type': 'application/json',
             },
             json={
-                'prompt': prompt,
+                'model': 'gpt-4',  # Wskazanie modelu GPT-4
+                'messages': [{'role': 'user', 'content': prompt}],
                 'max_tokens': 150,
             }
         )
-        if response.status_code == 400:
-            return jsonify({'error': 'Bad Request to OpenAI'}), 400
         response.raise_for_status()
-        generated_text = response.json()['choices'][0]['text']
+        generated_text = response.json()['choices'][0]['message']['content']
         return jsonify({'description': generated_text.strip()})
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error generating description: {str(e)}")
         return jsonify({'error': str(e)}), 500
-    except Exception as e:
-        app.logger.error(f"Unexpected error: {str(e)}")
-        return jsonify({'error': 'Internal Server Error'}), 500
-
-@app.route('/api/env', methods=['GET'])
-def get_env():
-    return jsonify({
-        'SELY_CLIENT_ID': SELY_CLIENT_ID,
-        'SELY_CLIENT_SECRET': SELY_CLIENT_SECRET,
-        'OPENAI_API_KEY': OPENAI_API_KEY
-    })
 
 if __name__ == '__main__':
     app.run(debug=True)
