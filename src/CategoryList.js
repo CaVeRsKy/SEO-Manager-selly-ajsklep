@@ -18,6 +18,8 @@ const CategoryList = () => {
             const response = await fetch(`${backendUrl}/api/categories`);
             const data = await response.json();
             if (response.ok) {
+                // Log the received categories
+                console.log(data);
                 setCategories(data);
             } else {
                 console.error("Error fetching categories:", data.error);

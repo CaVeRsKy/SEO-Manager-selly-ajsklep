@@ -14,7 +14,6 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 def home():
     return "Welcome to the SEO Selly API!", 200
 
-
 def get_selly_access_token():
     url = 'https://ajsklep.pl/api/auth/access_token'
     headers = {
@@ -39,6 +38,10 @@ def get_categories():
         }
         response = requests.get(url, headers=headers)
         response.raise_for_status()
+        
+        # Log the fetched categories
+        app.logger.info(response.json())
+        
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
@@ -60,17 +63,16 @@ def generate_description():
                 'Content-Type': 'application/json',
             },
             json={
-                'model': 'gpt-4',  # Wskazanie modelu GPT-4
-                'messages': [{'role': 'user', 'content': prompt}],
-                'max_tokens': 150,
+                'model': 'gpt-4',
+                'messages': [{'role': 'system', 'content': 'You are a helpful assistant.'},
+                             {'role': 'user', 'content': prompt}]
             }
         )
         response.raise_for_status()
-        generated_text = response.json()['choices'][0]['message']['content']
-        return jsonify({'description': generated_text.strip()})
+        return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error generating description: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 401
 
 if __name__ == '__main__':
     app.run(debug=True)
