@@ -1,95 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
+import './SeoEditor.css';
 
-const backendUrl = "https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com";
-
-const CategoryList = () => {
+const SeoEditor = () => {
     const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [seoPreview, setSeoPreview] = useState("");
+    const [generatedDescription, setGeneratedDescription] = useState('');
 
     useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/categories`);
+                if (response.status === 401) {
+                    console.error('Unauthorized access - check your API credentials');
+                } else {
+                    const data = await response.json();
+                    console.log('API response:', data);  // Log the response data for debugging
+                    if (data && Array.isArray(data)) {
+                        setCategories(data);
+                    } else {
+                        console.error('Invalid data format received from API', data);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
         fetchCategories();
     }, []);
 
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch(`${backendUrl}/api/categories`);
-            const data = await response.json();
-            if (response.ok) {
-                console.log(data);
-                setCategories(data);
-            } else {
-                console.error("Error fetching categories:", data.error);
-            }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        } finally {
-            setLoading(false);
+    const generateDescription = async () => {
+        if (!selectedCategory) {
+            console.error('No category selected');
+            return;
         }
-    };
 
-    const generateSEO = async (categoryName) => {
         try {
-            const response = await fetch(`${backendUrl}/api/generate-description`, {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/generate-description`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ category_name: categoryName }),
+                body: JSON.stringify({ category_name: selectedCategory.name }),
             });
+
             const data = await response.json();
-            if (response.ok) {
-                setSeoPreview(data.seo_description);
+            if (data && data.description) {
+                setGeneratedDescription(data.description);
             } else {
-                console.error("Error generating SEO:", data.error);
+                console.error('Invalid data format received from API', data);
             }
         } catch (error) {
-            console.error("Error generating SEO:", error);
+            console.error('Error generating description:', error);
         }
     };
 
-    const handleCategoryClick = (category) => {
-        setSelectedCategory(category);
-        generateSEO(category.name);
-    };
-
-    const renderCategories = (categories) => {
-        return (
-            <List>
-                {categories.map((category) => (
-                    <div key={category.id}>
-                        <ListItem button onClick={() => handleCategoryClick(category)}>
-                            <ListItemText primary={category.name} />
-                        </ListItem>
-                        {category.subcategories && renderCategories(category.subcategories)}
-                    </div>
-                ))}
-            </List>
-        );
-    };
-
     return (
-        <Container>
-            <Typography variant="h4" gutterBottom>
-                Lista kategorii
-            </Typography>
-            {loading ? (
-                <CircularProgress />
-            ) : (
-                renderCategories(categories)
-            )}
+        <div className="seo-editor">
+            <h1>SEO Editor</h1>
+            <div>
+                <select onChange={(e) => setSelectedCategory(categories.find(cat => cat.id === e.target.value))}>
+                    <option value="">Select a category</option>
+                    {categories.length > 0 ? categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                            {category.name}
+                        </option>
+                    )) : <option>Loading categories...</option>}
+                </select>
+            </div>
             {selectedCategory && (
                 <div>
-                    <Typography variant="h5" gutterBottom>
-                        Podgląd SEO dla: {selectedCategory.name}
-                    </Typography>
-                    <Typography variant="body1">{seoPreview}</Typography>
+                    <h2>{selectedCategory.name}</h2>
+                    <button onClick={generateDescription}>Generate Description</button>
+                    {generatedDescription && <p>{generatedDescription}</p>}
                 </div>
             )}
-        </Container>
+        </div>
     );
 };
 
-export default CategoryList;
+export default SeoEditor;
