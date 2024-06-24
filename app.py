@@ -28,6 +28,9 @@ def get_selly_access_token():
     response = requests.post(url, json=data, headers=headers)
     app.logger.info(f"Response status code: {response.status_code}")
     app.logger.info(f"Response content: {response.content}")
+    if response.status_code != 200:
+        app.logger.error(f"Failed to retrieve access token: {response.text}")
+        return None
     response.raise_for_status()
     access_token = response.json().get('access_token')
     if not access_token:
@@ -39,16 +42,14 @@ def get_selly_access_token():
 def get_categories():
     try:
         access_token = get_selly_access_token()
+        if access_token is None:
+            return jsonify({'error': 'Failed to retrieve access token'}), 401
         url = 'https://ajsklep.pl/api/categories'
         headers = {
             'Authorization': f'Bearer {access_token}'
         }
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        
-        # Log the fetched categories
-        app.logger.info(response.json())
-        
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
