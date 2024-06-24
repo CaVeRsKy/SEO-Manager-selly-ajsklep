@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import './SeoEditor.css';
+import './CategoryList.css';
 
-const SeoEditor = () => {
+const CategoryList = ({ onSelectCategory }) => {
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [generatedDescription, setGeneratedDescription] = useState('');
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -29,54 +27,19 @@ const SeoEditor = () => {
         fetchCategories();
     }, []);
 
-    const generateDescription = async () => {
-        if (!selectedCategory) {
-            console.error('No category selected');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/generate-description`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ category_name: selectedCategory.name }),
-            });
-
-            const data = await response.json();
-            if (data && data.description) {
-                setGeneratedDescription(data.description);
-            } else {
-                console.error('Invalid data format received from API', data);
-            }
-        } catch (error) {
-            console.error('Error generating description:', error);
-        }
-    };
-
     return (
-        <div className="seo-editor">
-            <h1>SEO Editor</h1>
-            <div>
-                <select onChange={(e) => setSelectedCategory(categories.find(cat => cat.id === e.target.value))}>
-                    <option value="">Select a category</option>
-                    {categories.length > 0 ? categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                            {category.name}
-                        </option>
-                    )) : <option>Loading categories...</option>}
-                </select>
-            </div>
-            {selectedCategory && (
-                <div>
-                    <h2>{selectedCategory.name}</h2>
-                    <button onClick={generateDescription}>Generate Description</button>
-                    {generatedDescription && <p>{generatedDescription}</p>}
-                </div>
-            )}
+        <div className="category-list">
+            {categories.length > 0 ? categories.map((category) => (
+                <button
+                    key={category.id}
+                    onClick={() => onSelectCategory(category)}
+                    className="category-button"
+                >
+                    {category.name}
+                </button>
+            )) : <p>Loading categories...</p>}
         </div>
     );
 };
 
-export default SeoEditor;
+export default CategoryList;
