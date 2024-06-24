@@ -26,7 +26,11 @@ def get_selly_access_token():
     }
     response = requests.post(url, json=data, headers=headers)
     response.raise_for_status()
-    return response.json()['access_token']
+    access_token = response.json().get('access_token')
+    if not access_token:
+        app.logger.error(f"Invalid response from Selly API: {response.json()}")
+        raise ValueError("Failed to retrieve access token from Selly API")
+    return access_token
 
 @app.route('/api/categories', methods=['GET'])
 def get_categories():
@@ -51,6 +55,8 @@ def get_categories():
 def generate_description():
     try:
         data = request.json
+        if data is None:
+            raise ValueError("Request JSON is None")
         category_name = data.get('category_name')
         if not category_name:
             return jsonify({'error': 'Category name is required'}), 400
@@ -73,6 +79,9 @@ def generate_description():
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error generating description: {str(e)}")
         return jsonify({'error': str(e)}), 401
+    except ValueError as ve:
+        app.logger.error(f"Value error: {str(ve)}")
+        return jsonify({'error': str(ve)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
