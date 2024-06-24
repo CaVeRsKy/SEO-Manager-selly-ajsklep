@@ -22,6 +22,7 @@ def get_selly_access_token():
     data = {
         'client_id': SELY_CLIENT_ID,
         'client_secret': SELY_CLIENT_SECRET,
+        'grant_type': 'client_credentials',  # Zakładamy, że grant_type to client_credentials
         'scope': 'READWRITE'
     }
     app.logger.info(f"Requesting token with data: {data}")
@@ -37,6 +38,7 @@ def get_selly_access_token():
         app.logger.error(f"Invalid response from Selly API: {response.json()}")
         raise ValueError("Failed to retrieve access token from Selly API")
     return access_token
+
 
 @app.route('/api/categories', methods=['GET'])
 def get_categories():
