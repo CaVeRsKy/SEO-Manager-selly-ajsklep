@@ -22,7 +22,7 @@ def get_selly_access_token():
     data = {
         'client_id': SELY_CLIENT_ID,
         'client_secret': SELY_CLIENT_SECRET,
-        'grant_type': 'client_credentials',  # Zakładamy, że grant_type to client_credentials
+        'grant_type': 'client_credentials',
         'scope': 'READWRITE'
     }
     app.logger.info(f"Requesting token with data: {data}")
@@ -52,7 +52,6 @@ def get_categories():
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
-        # Sprawdzenie, czy dane są w odpowiednim formacie
         categories_data = response.json().get('data')
         if not categories_data:
             return jsonify({'error': 'No categories data found'}), 404
@@ -61,8 +60,8 @@ def get_categories():
             parsed_categories = []
             for category in categories:
                 parsed_categories.append({
-                    'id': category['id'],
-                    'name': category['name'],
+                    'id': category.get('id'),
+                    'name': category.get('name'),
                     'subcategories': parse_categories(category.get('subcategories', []))
                 })
             return parsed_categories
@@ -72,6 +71,12 @@ def get_categories():
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
         return jsonify({'error': 'Error fetching categories', 'message': str(e)}), 500
+    except ValueError as ve:
+        app.logger.error(f"Value error: {str(ve)}")
+        return jsonify({'error': str(ve)}), 400
+    except KeyError as ke:
+        app.logger.error(f"Key error: {str(ke)}")
+        return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
 
 @app.route('/api/generate-description', methods=['POST'])
 def generate_description():
