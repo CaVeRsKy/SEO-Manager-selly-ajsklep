@@ -24,8 +24,10 @@ def get_selly_access_token():
         'client_secret': SELY_CLIENT_SECRET,
         'scope': 'READWRITE'
     }
+    app.logger.info(f"Requesting token with data: {data}")
     response = requests.post(url, json=data, headers=headers)
-    app.logger.info(f"Response from Selly API: {response.json()}")
+    app.logger.info(f"Response status code: {response.status_code}")
+    app.logger.info(f"Response content: {response.content}")
     response.raise_for_status()
     access_token = response.json().get('access_token')
     if not access_token:
