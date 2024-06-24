@@ -52,7 +52,23 @@ def get_categories():
         }
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        return jsonify(response.json())
+        
+        categories_data = response.json().get('data')
+        if not categories_data:
+            return jsonify({'error': 'No categories data found'}), 404
+        
+        def parse_categories(categories):
+            parsed_categories = []
+            for category in categories:
+                parsed_categories.append({
+                    'id': category['id'],
+                    'name': category['name'],
+                    'subcategories': parse_categories(category.get('subcategories', []))
+                })
+            return parsed_categories
+        
+        parsed_categories = parse_categories(categories_data)
+        return jsonify({'categories': parsed_categories})
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
         return jsonify({'error': str(e)}), 401

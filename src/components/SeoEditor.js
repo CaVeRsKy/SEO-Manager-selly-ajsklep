@@ -10,16 +10,11 @@ const SeoEditor = () => {
         const fetchCategories = async () => {
             try {
                 const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/categories`);
-                if (response.status === 401) {
-                    console.error('Unauthorized access - check your API credentials');
+                const data = await response.json();
+                if (response.status !== 200 || !data.categories) {
+                    console.error('Invalid data format received from API', data);
                 } else {
-                    const responseData = await response.json();
-                    console.log('API response:', responseData);  // Log the response data for debugging
-                    if (responseData && responseData.data && Array.isArray(responseData.data)) {
-                        setCategories(responseData.data);
-                    } else {
-                        console.error('Invalid data format received from API', responseData);
-                    }
+                    setCategories(data.categories);
                 }
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -30,11 +25,6 @@ const SeoEditor = () => {
     }, []);
 
     const generateDescription = async () => {
-        if (!selectedCategory) {
-            console.error('No category selected');
-            return;
-        }
-
         try {
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/generate-description`, {
                 method: 'POST',
@@ -44,30 +34,39 @@ const SeoEditor = () => {
                 body: JSON.stringify({ category_name: selectedCategory.name }),
             });
 
-            const responseData = await response.json();
-            if (responseData && responseData.description) {
-                setGeneratedDescription(responseData.description);
+            const data = await response.json();
+            if (response.status !== 200 || !data.choices) {
+                console.error('Invalid data format received from API', data);
             } else {
-                console.error('Invalid data format received from API', responseData);
+                setGeneratedDescription(data.choices[0].message.content);
             }
         } catch (error) {
             console.error('Error generating description:', error);
         }
     };
 
+    const renderCategories = (categories) => {
+        return (
+            <ul>
+                {categories.map((category) => (
+                    <li key={category.id}>
+                        <button onClick={() => setSelectedCategory(category)}>{category.name}</button>
+                        {category.subcategories.length > 0 && renderCategories(category.subcategories)}
+                    </li>
+                ))}
+            </ul>
+        );
+    };
+
     return (
         <div className="seo-editor">
             <h1>SEO Editor</h1>
-            <div className="category-list">
-                {categories.length > 0 ? categories.map((category) => (
-                    <button
-                        key={category.id}
-                        onClick={() => setSelectedCategory(category)}
-                        className="category-button"
-                    >
-                        {category.name}
-                    </button>
-                )) : <p>Loading categories...</p>}
+            <div>
+                {categories.length > 0 ? (
+                    renderCategories(categories)
+                ) : (
+                    <p>Loading categories...</p>
+                )}
             </div>
             {selectedCategory && (
                 <div>
