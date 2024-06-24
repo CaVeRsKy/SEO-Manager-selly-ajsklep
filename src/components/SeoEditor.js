@@ -13,12 +13,12 @@ const SeoEditor = () => {
                 if (response.status === 401) {
                     console.error('Unauthorized access - check your API credentials');
                 } else {
-                    const data = await response.json();
-                    console.log('API response:', data);  // Log the response data for debugging
-                    if (data && Array.isArray(data)) {
-                        setCategories(data);
+                    const responseData = await response.json();
+                    console.log('API response:', responseData);  // Log the response data for debugging
+                    if (responseData && responseData.data && Array.isArray(responseData.data)) {
+                        setCategories(responseData.data);
                     } else {
-                        console.error('Invalid data format received from API', data);
+                        console.error('Invalid data format received from API', responseData);
                     }
                 }
             } catch (error) {
@@ -44,11 +44,11 @@ const SeoEditor = () => {
                 body: JSON.stringify({ category_name: selectedCategory.name }),
             });
 
-            const data = await response.json();
-            if (data && data.description) {
-                setGeneratedDescription(data.description);
+            const responseData = await response.json();
+            if (responseData && responseData.description) {
+                setGeneratedDescription(responseData.description);
             } else {
-                console.error('Invalid data format received from API', data);
+                console.error('Invalid data format received from API', responseData);
             }
         } catch (error) {
             console.error('Error generating description:', error);
