@@ -5,11 +5,10 @@ const SeoEditor = () => {
 
   useEffect(() => {
     fetchCategories().then(response => {
-      // Załóżmy, że response.data zawiera dane kategorii
-      if (Array.isArray(response.data)) {
-        setCategories(response.data);
+      if (Array.isArray(response)) {
+        setCategories(response);
       } else {
-        console.error('Error fetching categories: Expected an array but got', typeof response.data);
+        console.error('Error fetching categories: Expected an array but got', typeof response);
         setCategories([]);
       }
     }).catch(error => {
@@ -19,9 +18,17 @@ const SeoEditor = () => {
   }, []);
 
   const fetchCategories = async () => {
-    // Tutaj umieść swój kod do pobierania kategorii, np. za pomocą fetch
-    const response = await fetch('/api/categories');
-    return await response.json();
+    try {
+      const response = await fetch('/api/categories');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
   };
 
   return (
