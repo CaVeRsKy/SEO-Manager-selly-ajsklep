@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/SEO-Manager-selly-ajsklep/static/css/main.1fb9655b.css",
-    "main.js": "/SEO-Manager-selly-ajsklep/static/js/main.a309c45a.js",
+    "main.js": "/SEO-Manager-selly-ajsklep/static/js/main.75114098.js",
     "index.html": "/SEO-Manager-selly-ajsklep/index.html",
     "main.1fb9655b.css.map": "/SEO-Manager-selly-ajsklep/static/css/main.1fb9655b.css.map",
-    "main.a309c45a.js.map": "/SEO-Manager-selly-ajsklep/static/js/main.a309c45a.js.map"
+    "main.75114098.js.map": "/SEO-Manager-selly-ajsklep/static/js/main.75114098.js.map"
   },
   "entrypoints": [
     "static/css/main.1fb9655b.css",
-    "static/js/main.a309c45a.js"
+    "static/js/main.75114098.js"
   ]
 }

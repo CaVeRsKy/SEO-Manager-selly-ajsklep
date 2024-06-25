@@ -5,10 +5,11 @@ const SeoEditor = () => {
 
   useEffect(() => {
     fetchCategories().then(response => {
-      if (response && Array.isArray(response.data)) {
-        setCategories(response.data);
+      console.log('API response:', response); // Logowanie całej odpowiedzi
+      if (response && Array.isArray(response.categories)) {
+        setCategories(response.categories);
       } else {
-        console.error('Error fetching categories: Expected an array but got', typeof response.data);
+        console.error('Error fetching categories: Expected an array but got', response ? typeof response.categories : 'undefined');
         setCategories([]);
       }
     }).catch(error => {
@@ -19,7 +20,7 @@ const SeoEditor = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/categories'); // Ustaw właściwy adres URL
+      const response = await fetch('https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/categories');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -27,7 +28,7 @@ const SeoEditor = () => {
       return data;
     } catch (error) {
       console.error('Error fetching categories:', error);
-      return { data: [] }; // Zwróć pustą tablicę w polu data w przypadku błędu
+      return { categories: [] }; // Zwróć pustą tablicę w polu categories w przypadku błędu
     }
   };
 
