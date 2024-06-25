@@ -19,7 +19,7 @@ const SeoEditor = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/categories'); // Ustaw właściwy adres URL
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
