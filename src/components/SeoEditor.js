@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'eact';
 import './SeoEditor.css';
 
 const SeoEditor = () => {
@@ -42,7 +42,7 @@ const SeoEditor = () => {
       }
       const data = await response.json();
       console.log(`Description generated for ${category.name}:`, data.description);
-      setDescriptions((prevDescriptions) => ({ ...prevDescriptions, [category.id]: data.description }));
+      setDescriptions((prevDescriptions) => ({...prevDescriptions, [category.id]: data.description }));
     } catch (error) {
       console.error('Error generating description:', error);
     }
@@ -51,7 +51,7 @@ const SeoEditor = () => {
   return (
     <div>
       <h1>SEO Editor</h1>
-      {categories.length === 0 ? (
+      {categories.length === 0? (
         <p>Loading categories...</p>
       ) : (
         <ul>
