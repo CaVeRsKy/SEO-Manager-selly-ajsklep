@@ -6,6 +6,7 @@ const SeoEditor = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10); // Ustawienie limitu na 10 kategorii na stronę
   const [totalPages, setTotalPages] = useState(1);
+  const [descriptions, setDescriptions] = useState({}); // Add a new state variable to store generated descriptions
 
   useEffect(() => {
     fetchCategories(page, limit);
@@ -41,7 +42,7 @@ const SeoEditor = () => {
       }
       const data = await response.json();
       console.log(`Description generated for ${category.name}:`, data.description);
-      // Tutaj można zaktualizować stan kategorii z nowym opisem, jeśli to konieczne
+      setDescriptions((prevDescriptions) => ({ ...prevDescriptions, [category.id]: data.description }));
     } catch (error) {
       console.error('Error generating description:', error);
     }
@@ -58,6 +59,7 @@ const SeoEditor = () => {
             <li key={index}>
               {category.name}
               <button onClick={() => handleGenerateDescription(category)}>Generate Description</button>
+              {descriptions[category.id] && <p>Generated description: {descriptions[category.id]}</p>}
             </li>
           ))}
         </ul>

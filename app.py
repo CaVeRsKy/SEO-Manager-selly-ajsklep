@@ -49,7 +49,9 @@ def get_categories():
         headers = {
             'Authorization': f'Bearer {access_token}'
         }
-        response = requests.get(url, headers=headers)
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 10))
+        response = requests.get(url, headers=headers, params={'page': page, 'limit': limit})
         response.raise_for_status()
 
         categories_data = response.json().get('data')
@@ -67,7 +69,8 @@ def get_categories():
             return parsed_categories
 
         parsed_categories = parse_categories(categories_data)
-        return jsonify({'categories': parsed_categories})
+        total = response.json().get('total')
+        return jsonify({'categories': parsed_categories, 'total': total})
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
         return jsonify({'error': 'Error fetching categories', 'message': str(e)}), 500
@@ -84,11 +87,11 @@ def generate_description():
         data = request.json
         if data is None:
             raise ValueError("Request JSON is None")
-        category_name = data.get('category_name')
-        if not category_name:
-            return jsonify({'error': 'Category name is required'}), 400
+        category_id = data.get('categoryId')
+        if not category_id:
+            return jsonify({'error': 'Category ID is required'}), 400
 
-        prompt = f"Generate a product description for the category: {category_name}"
+        prompt = f"Generate a product description for the category with ID: {category_id}"
         response = requests.post(
             'https://api.openai.com/v1/chat/completions',
             headers={
