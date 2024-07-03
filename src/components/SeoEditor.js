@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './SeoEditor.css';
 
 const SeoEditor = () => {
   const [categories, setCategories] = useState([]);
@@ -7,12 +6,15 @@ const SeoEditor = () => {
   const [limit] = useState(10); // Ustawienie limitu na 10 kategorii na stronę
   const [totalPages, setTotalPages] = useState(1);
   const [descriptions, setDescriptions] = useState({}); // Add a new state variable to store generated descriptions
+  const [loading, setLoading] = useState(false); // Add a new state variable to track loading state
+  const [error, setError] = useState(null); // Add a new state variable to track error state
 
   useEffect(() => {
     fetchCategories(page, limit);
   }, [page, limit]);
 
   const fetchCategories = async (page, limit) => {
+    setLoading(true);
     try {
       const response = await fetch(`https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/categories?page=${page}&limit=${limit}`);
       if (!response.ok) {
@@ -22,13 +24,17 @@ const SeoEditor = () => {
       console.log('Fetched data:', data);
       setCategories(data.categories);
       setTotalPages(Math.ceil(data.total / limit)); // Ustawienie total pages na podstawie total records
+      setError(null);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setCategories([]);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGenerateDescription = async (category) => {
+    setLoading(true);
     try {
       const response = await fetch(`https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/generate-description`, {
         method: 'POST',
@@ -42,21 +48,25 @@ const SeoEditor = () => {
       }
       const data = await response.json();
       console.log(`Description generated for ${category.name}:`, data.description);
-      setDescriptions((prevDescriptions) => ({...prevDescriptions, [category.id]: data.description }));
+      setDescriptions((prevDescriptions) => ({ ...prevDescriptions, [category.id]: data.description }));
+      setError(null);
     } catch (error) {
       console.error('Error generating description:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
       <h1>SEO Editor</h1>
-      {categories.length === 0? (
+      {loading ? (
         <p>Loading categories...</p>
       ) : (
         <ul>
-          {categories.map((category, index) => (
-            <li key={index}>
+          {categories.map((category) => (
+            <li key={category.id}>
               {category.name}
               <button onClick={() => handleGenerateDescription(category)}>Generate Description</button>
               {descriptions[category.id] && <p>Generated description: {descriptions[category.id]}</p>}
@@ -64,6 +74,7 @@ const SeoEditor = () => {
           ))}
         </ul>
       )}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <div>
         <button onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</button>
         <span>Page {page} of {totalPages}</span>
