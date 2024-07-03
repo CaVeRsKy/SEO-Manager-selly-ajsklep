@@ -24,6 +24,13 @@ if not SELY_CLIENT_ID or not SELY_CLIENT_SECRET or not OPENAI_API_KEY:
 def home():
     return "Welcome to the SEO Selly API!", 200
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
 def get_selly_access_token():
     url = 'https://ajsklep.pl/api/auth/access_token'
     headers = {
@@ -39,7 +46,7 @@ def get_selly_access_token():
     response = requests.post(url, json=data, headers=headers)
     app.logger.info(f"Response status code: {response.status_code}")
     app.logger.info(f"Response content: {response.content}")
-    if response.status_code!= 200:
+    if response.status_code != 200:
         app.logger.error(f"Failed to retrieve access token: {response.text}")
         return None
     response.raise_for_status()
@@ -74,7 +81,7 @@ def get_categories():
                 parsed_categories.append({
                     'id': category.get('id'),
                     'name': category.get('name'),
-                    'ubcategories': parse_categories(category.get('subcategories', []))
+                    'subcategories': parse_categories(category.get('subcategories', []))
                 })
             return parsed_categories
 
@@ -83,13 +90,13 @@ def get_categories():
         return jsonify({'categories': parsed_categories, 'total': total})
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error fetching categories: {str(e)}")
-        return jsonify({'error': 'Error fetching categories', 'essage': str(e)}), 500
+        return jsonify({'error': 'Error fetching categories', 'message': str(e)}), 500
     except ValueError as ve:
         app.logger.error(f"Value error: {str(ve)}")
         return jsonify({'error': str(ve)}), 400
     except KeyError as ke:
         app.logger.error(f"Key error: {str(ke)}")
-        return jsonify({'error': 'Invalid data format', 'essage': str(ke)}), 500
+        return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
 
 @app.route('/api/generate-description', methods=['POST'])
 @cross_origin(origin='*',headers=['Content-Type','Authorization'])
@@ -119,7 +126,10 @@ def generate_description():
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Error generating description: {str(e)}")
-        return jsonify({'error': 'Error generating description', 'essage': str(e)}), 500
+        return jsonify({'error': 'Error generating description', 'message': str(e)}), 500
     except ValueError as ve:
         app.logger.error(f"Value error: {str(ve)}")
         return jsonify({'error': str(ve)}), 400
+    except KeyError as ke:
+        app.logger.error(f"Key error: {str(ke)}")
+        return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
