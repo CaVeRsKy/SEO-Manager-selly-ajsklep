@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/SEO-Manager-selly-ajsklep/static/css/main.31596499.css",
+    "main.js": "/SEO-Manager-selly-ajsklep/static/js/main.044c50f5.js",
+    "index.html": "/SEO-Manager-selly-ajsklep/index.html",
+    "main.31596499.css.map": "/SEO-Manager-selly-ajsklep/static/css/main.31596499.css.map",
+    "main.044c50f5.js.map": "/SEO-Manager-selly-ajsklep/static/js/main.044c50f5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31596499.css",
+    "static/js/main.044c50f5.js"
+  ]
+}
