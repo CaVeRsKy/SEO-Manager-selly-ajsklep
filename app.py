@@ -61,7 +61,7 @@ def get_categories():
         }
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 10))
-        response = requests.get(url, headers=headers, params={'page': page, 'limit': limit})
+        response = requests.get(url, headers=headers, params={'page': page, 'limit': limit}, mode='no-cors')
         response.raise_for_status()
 
         categories_data = response.json().get('data')
@@ -113,7 +113,8 @@ def generate_description():
                 'model': 'gpt-4',
                 'messages': [{'role': 'system', 'content': 'You are a helpful assistant.'},
                              {'role': 'user', 'content': prompt}]
-                              }
+            },
+            mode='no-cors'  # Add this option
         )
         response.raise_for_status()
         return jsonify(response.json())
