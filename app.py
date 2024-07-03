@@ -33,7 +33,7 @@ def get_selly_access_token():
         'client_id': SELY_CLIENT_ID,
         'client_secret': SELY_CLIENT_SECRET,
         'grant_type': 'client_credentials',
-        'cope': 'READWRITE'
+        'scope': 'READWRITE'
     }
     app.logger.info(f"Requesting token with data: {data}")
     response = requests.post(url, json=data, headers=headers)
