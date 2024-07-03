@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ['*'], "supports_credentials": True}})
+CORS(app, resources={r"/api/*": {"origins": ["https://caversky.github.io/"], "supports_credentials": True}})
 
 @app.after_request
 def after_request(response):
