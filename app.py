@@ -1,7 +1,7 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "https://caversky.github.io"}})\
@@ -90,6 +90,7 @@ def get_categories():
         return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
 
 @app.route('/api/generate-description', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def generate_description():
     try:
         data = request.json
