@@ -24,13 +24,6 @@ if not SELY_CLIENT_ID or not SELY_CLIENT_SECRET or not OPENAI_API_KEY:
 def home():
     return "Welcome to the SEO Selly API!", 200
 
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
-    return response
-
 def get_selly_access_token():
     url = 'https://ajsklep.pl/api/auth/access_token'
     headers = {
