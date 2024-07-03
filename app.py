@@ -93,7 +93,6 @@ def get_categories():
         return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
 
 @app.route('/api/generate-description', methods=['POST'])
-@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def generate_description():
     try:
         data = request.get_json()
