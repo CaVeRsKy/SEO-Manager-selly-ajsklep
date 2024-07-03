@@ -61,7 +61,7 @@ def get_categories():
         }
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 10))
-        response = requests.get(url, headers=headers, params={'page': page, 'limit': limit}, mode='no-cors')
+        response = requests.get(url, headers=headers, params={'page': page, 'limit': limit})
         response.raise_for_status()
 
         categories_data = response.json().get('data')
@@ -127,3 +127,6 @@ def generate_description():
     except KeyError as ke:
         app.logger.error(f"Key error: {str(ke)}")
         return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
