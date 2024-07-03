@@ -10,7 +10,7 @@ CORS(app, resources={r"/api/*": {"origins": ["https://caversky.github.io"], "sup
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
 SELY_CLIENT_ID = os.environ.get('SELY_CLIENT_ID')
