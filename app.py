@@ -1,28 +1,10 @@
 import os
 import requests
 from flask import Flask, request, jsonify, make_response
+from flask_cors import CORS
 
 app = Flask(__name__)
-
-ALLOWED_ORIGIN = 'https://caversky.github.io'
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', ALLOWED_ORIGIN)
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
-
-@app.route('/api/categories', methods=['OPTIONS'])
-@app.route('/api/generate-description', methods=['OPTIONS'])
-def handle_options():
-    response = make_response()
-    response.headers.add('Access-Control-Allow-Origin', ALLOWED_ORIGIN)
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
+CORS(app, supports_credentials=True, origins=["https://caversky.github.io"])
 
 SELY_CLIENT_ID = os.environ.get('SELY_CLIENT_ID')
 SELY_CLIENT_SECRET = os.environ.get('SELY_CLIENT_SECRET')
