@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 const SeoEditor = () => {
   const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // Ustawienie limitu na 10 kategorii na stronę
+  const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  const [descriptions, setDescriptions] = useState({}); // Add a new state variable to store generated descriptions
-  const [loading, setLoading] = useState(false); // Add a new state variable to track loading state
-  const [error, setError] = useState(null); // Add a new state variable to track error state
+  const [descriptions, setDescriptions] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchCategories(page, limit);
@@ -26,7 +26,7 @@ const SeoEditor = () => {
 
       if (data && data.categories && data.total) {
         setCategories(data.categories);
-        setTotalPages(Math.ceil(data.total / limit)); // Ustawienie total pages na podstawie total records
+        setTotalPages(Math.ceil(data.total / limit));
       } else {
         throw new Error('Invalid data format');
       }

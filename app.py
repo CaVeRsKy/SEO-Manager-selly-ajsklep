@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -47,6 +47,10 @@ def get_categories():
         }
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 10))
+        
+        # Log the parameters for debugging
+        app.logger.info(f"Fetching categories with page: {page}, limit: {limit}")
+        
         response = requests.get(url, headers=headers, params={'page': page, 'limit': limit})
         response.raise_for_status()
 
