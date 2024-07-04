@@ -88,9 +88,11 @@ def get_categories():
 def generate_description():
     try:
         data = request.get_json()
+        app.logger.info(f"Received request data: {data}")
         if data is None:
             raise ValueError("Request JSON is None")
         category_id = data.get('categoryId')
+        app.logger.info(f"Category ID: {category_id}")
         if not category_id:
             return jsonify({'error': 'Category ID is required'}), 400
 
@@ -107,6 +109,7 @@ def generate_description():
                              {'role': 'user', 'content': prompt}]
             }
         )
+        app.logger.info(f"OpenAI API response: {response.json()}")
         response.raise_for_status()
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
@@ -118,6 +121,7 @@ def generate_description():
     except KeyError as ke:
         app.logger.error(f"Key error: {str(ke)}")
         return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
