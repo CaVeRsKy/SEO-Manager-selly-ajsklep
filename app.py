@@ -28,17 +28,10 @@ def get_selly_access_token():
         'grant_type': 'client_credentials',
         'scope': 'READWRITE'
     }
-    app.logger.info(f"Requesting token with data: {data}")
     response = requests.post(url, json=data, headers=headers)
-    app.logger.info(f"Response status code: {response.status_code}")
-    app.logger.info(f"Response content: {response.content}")
-    if response.status_code != 200:
-        app.logger.error(f"Failed to retrieve access token: {response.text}")
-        return None
     response.raise_for_status()
     access_token = response.json().get('access_token')
     if not access_token:
-        app.logger.error(f"Invalid response from Selly API: {response.json()}")
         raise ValueError("Failed to retrieve access token from Selly API")
     return access_token
 
@@ -57,42 +50,38 @@ def get_categories():
         response = requests.get(url, headers=headers, params={'page': page, 'limit': limit})
         response.raise_for_status()
 
-        categories_data = response.json().get('data')
-        if not categories_data:
-            return jsonify({'error': 'No categories data found'}), 404
+        data = response.json()
+        categories_data = data.get('data')
+        total = data.get('total')
+        if categories_data is None or total is None:
+            return jsonify({'error': 'Invalid data format'}), 400
 
         def parse_categories(categories):
             parsed_categories = []
             for category in categories:
                 parsed_categories.append({
-                    'id': category.get('id'),
+                    'id': category.get('category_id'),
                     'name': category.get('name'),
                     'subcategories': parse_categories(category.get('subcategories', []))
                 })
             return parsed_categories
 
         parsed_categories = parse_categories(categories_data)
-        total = response.json().get('total')
         return jsonify({'categories': parsed_categories, 'total': total})
     except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error fetching categories: {str(e)}")
         return jsonify({'error': 'Error fetching categories', 'message': str(e)}), 500
     except ValueError as ve:
-        app.logger.error(f"Value error: {str(ve)}")
         return jsonify({'error': str(ve)}), 400
     except KeyError as ke:
-        app.logger.error(f"Key error: {str(ke)}")
         return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
 
 @app.route('/api/generate-description', methods=['POST'])
 def generate_description():
     try:
         data = request.get_json()
-        app.logger.info(f"Received request data: {data}")
         if data is None:
             raise ValueError("Request JSON is None")
         category_id = data.get('categoryId')
-        app.logger.info(f"Category ID: {category_id}")
         if not category_id:
             return jsonify({'error': 'Category ID is required'}), 400
 
@@ -109,19 +98,14 @@ def generate_description():
                              {'role': 'user', 'content': prompt}]
             }
         )
-        app.logger.info(f"OpenAI API response: {response.json()}")
         response.raise_for_status()
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error generating description: {str(e)}")
         return jsonify({'error': 'Error generating description', 'message': str(e)}), 500
     except ValueError as ve:
-        app.logger.error(f"Value error: {str(ve)}")
         return jsonify({'error': str(ve)}), 400
     except KeyError as ke:
-        app.logger.error(f"Key error: {str(ke)}")
         return jsonify({'error': 'Invalid data format', 'message': str(ke)}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)

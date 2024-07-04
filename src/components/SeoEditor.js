@@ -53,8 +53,8 @@ const SeoEditor = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log(`Description generated for ${category.name}:`, data.description);
-      setDescriptions((prevDescriptions) => ({ ...prevDescriptions, [category.id]: data.description }));
+      console.log(`Description generated for ${category.name}:`, data.choices[0].message.content);
+      setDescriptions((prevDescriptions) => ({ ...prevDescriptions, [category.id]: data.choices[0].message.content }));
     } catch (error) {
       console.error('Error generating description:', error);
       setError(error.message);
