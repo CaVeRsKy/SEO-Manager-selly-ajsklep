@@ -8,6 +8,8 @@ CORS(app, origins=['https://caversky.github.io'], supports_credentials=True)
 
 @app.after_request
 def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://caversky.github.io')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
