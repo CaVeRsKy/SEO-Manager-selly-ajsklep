@@ -1,11 +1,15 @@
 import os
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
+import logging
 
 app = Flask(__name__)
 
+logging.basicConfig(level=logging.DEBUG)
+
 @app.after_request
 def after_request(response):
+    logging.debug(f"Setting Access-Control-Allow-Origin: {response.headers.get('Access-Control-Allow-Origin')}")
     response.headers.add('Access-Control-Allow-Origin', 'https://caversky.github.io')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
@@ -15,7 +19,8 @@ def after_request(response):
 @app.route('/api/categories', methods=['OPTIONS'])
 @app.route('/api/generate-description', methods=['OPTIONS'])
 def handle_options():
-    response = jsonify()
+    response = make_response()
+    logging.debug(f"Setting Access-Control-Allow-Origin: {response.headers.get('Access-Control-Allow-Origin')}")
     response.headers.add('Access-Control-Allow-Origin', 'https://caversky.github.io')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
