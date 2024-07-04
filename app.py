@@ -1,10 +1,8 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, origins=['https://caversky.github.io'], supports_credentials=True)
 
 @app.after_request
 def after_request(response):
@@ -13,9 +11,6 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
-
-# Remove this line to avoid double registration
-# app.after_request(after_request)
 
 SELY_CLIENT_ID = os.environ.get('SELY_CLIENT_ID')
 SELY_CLIENT_SECRET = os.environ.get('SELY_CLIENT_SECRET')
