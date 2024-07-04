@@ -36,7 +36,7 @@ const SeoEditor = () => {
   const handleGenerateDescription = async (category) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/generate-description`, {
+      const response = await fetch(`https://murmuring-retreat-22519-82cce4da63ef.herokuapp.com/api/generate-description`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
