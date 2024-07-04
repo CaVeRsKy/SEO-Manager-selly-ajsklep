@@ -14,7 +14,8 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
-app.after_request(after_request)
+# Remove this line to avoid double registration
+# app.after_request(after_request)
 
 SELY_CLIENT_ID = os.environ.get('SELY_CLIENT_ID')
 SELY_CLIENT_SECRET = os.environ.get('SELY_CLIENT_SECRET')
@@ -115,8 +116,7 @@ def generate_description():
                 'model': 'gpt-4',
                 'messages': [{'role': 'system', 'content': 'You are a helpful assistant.'},
                              {'role': 'user', 'content': prompt}]
-            },
-            mode='no-cors'  # Add this option
+            }
         )
         response.raise_for_status()
         return jsonify(response.json())
